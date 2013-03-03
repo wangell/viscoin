@@ -8,9 +8,11 @@
 using namespace std;
 using boost::format;
 
+#define MAGIC_BLOCK 0xd9b4bef9
+
 struct blkstart
 {
-	char magic[4];
+	unsigned int magic;
 	unsigned int blksize;
 	char blkhead[80];
 };
@@ -41,13 +43,15 @@ int main(int argc, char** argv)
 	int blockNum = 0;
 
 	//for(int k = 0; k < 5; ++k)
-	while(blkFile)
+	while(blkFile.peek() != EOF)
 	{
 		blkFile.seekg(blockPos);
 		char blockStart[88];
 		blkFile.read(blockStart, 88);
 		blkstart* curBlock;
 		curBlock = (blkstart*) blockStart;
+		if (curBlock-> magic != MAGIC_BLOCK)
+			break;
 		blkheader* curHead;
 		curHead = (blkheader*) curBlock->blkhead;
 		cout<<"Block #: "<<blockNum++<<endl;
