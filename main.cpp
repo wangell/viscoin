@@ -4,6 +4,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <boost/format.hpp>
+#include <iomanip>
 
 using namespace std;
 using boost::format;
@@ -20,12 +21,20 @@ struct blkstart
 struct blkheader
 {
 	unsigned int ver;
-	char prevHash[32];
-	char merkRoot[32];
+	unsigned char prevHash[32];
+	unsigned char merkRoot[32];
 	unsigned int ts;
 	unsigned int bits;
 	unsigned int nonce;
 };
+
+void printHash(unsigned char h[32])
+{
+	for (int k = 0; k < 32; ++k)
+	{
+		cout<<hex<<setfill('0')<<setw(2)<<(int)h[k];
+	}
+}
 
 int main(int argc, char** argv)
 {
@@ -42,7 +51,6 @@ int main(int argc, char** argv)
 	int blockPos = 0;
 	int blockNum = 0;
 
-	//for(int k = 0; k < 5; ++k)
 	while(blkFile.peek() != EOF)
 	{
 		blkFile.seekg(blockPos);
@@ -57,7 +65,9 @@ int main(int argc, char** argv)
 		cout<<"Block #: "<<blockNum++<<endl;
 		cout<<"Block Size: "<<curBlock->blksize<<endl;
 		cout<<"Block ver: "<<curHead->ver<<endl;
-		cout<<"Prev hash: "<<"hash"<<endl;//curHead->prevHash<<endl;
+		cout<<"Prev hash: ";
+		printHash(curHead->prevHash);
+		cout<<endl;//curHead->prevHash<<endl;
 
 		char time_p[80];
 		time_t t = (time_t)curHead->ts;
