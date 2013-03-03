@@ -32,7 +32,7 @@ void printHash(unsigned char h[32])
 {
 	for (int k = 0; k < 32; ++k)
 	{
-		cout<<hex<<setfill('0')<<setw(2)<<(int)h[k];
+		cout<<hex<<setfill('0')<<setw(2)<<(int)h[k]<<dec;
 	}
 }
 
