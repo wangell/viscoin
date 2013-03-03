@@ -1,32 +1,15 @@
-#pragma pack(1)
 #include <iostream>
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
-#include <boost/format.hpp>
 #include <iomanip>
+#include <list>
+#include "blkstart.h"
+#include "blkheader.h"
 
 using namespace std;
-using boost::format;
 
 #define MAGIC_BLOCK 0xd9b4bef9
-
-struct blkstart
-{
-	unsigned int magic;
-	unsigned int blksize;
-	char blkhead[80];
-};
-
-struct blkheader
-{
-	unsigned int ver;
-	unsigned char prevHash[32];
-	unsigned char merkRoot[32];
-	unsigned int ts;
-	unsigned int bits;
-	unsigned int nonce;
-};
 
 void printHash(unsigned char h[32])
 {
@@ -54,20 +37,21 @@ int main(int argc, char** argv)
 	while(blkFile.peek() != EOF)
 	{
 		blkFile.seekg(blockPos);
-		char blockStart[88];
+		char* blockStart = new char[88];
 		blkFile.read(blockStart, 88);
-		blkstart* curBlock;
-		curBlock = (blkstart*) blockStart;
+		blkstart* curBlock = (blkstart*) blockStart;
+
+		//If the block doesn't start with the magic number the file is done/bogus
 		if (curBlock-> magic != MAGIC_BLOCK)
 			break;
-		blkheader* curHead;
-		curHead = (blkheader*) curBlock->blkhead;
+
+		blkheader* curHead = (blkheader*) curBlock->blkhead;
 		cout<<"Block #: "<<blockNum++<<endl;
 		cout<<"Block Size: "<<curBlock->blksize<<endl;
 		cout<<"Block ver: "<<curHead->ver<<endl;
 		cout<<"Prev hash: ";
 		printHash(curHead->prevHash);
-		cout<<endl;//curHead->prevHash<<endl;
+		cout<<endl;
 
 		char time_p[80];
 		time_t t = (time_t)curHead->ts;
@@ -83,4 +67,6 @@ int main(int argc, char** argv)
 		//Initial 8 blocks + size
 		blockPos+=curBlock->blksize+8;
 	}
+
+	cout<<"File contains "<<blockNum<<" blocks."<<endl;
 }
